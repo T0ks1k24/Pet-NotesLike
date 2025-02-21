@@ -1,0 +1,63 @@
+# Visual Studio/JetBrains Rider
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+bin/
+obj/
+out/
+*.exe
+*.dll
+*.pdb
+*.app/
+*.ipa/
+*.appxbundle
+*.msi
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.assets.json
+
+# Logs & temp files
+logs/
+*.log
+*.tlog
+*.nlog
+*.log.xml
+*.tmp
+*.cache
+*.db
+
+# Config files (secrets)
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+.env
+
+# Entity Framework Migrations (optional)
+Migrations/
+
+# Docker files (if using Docker)
+docker-compose.override.yml
+.env
+
+# Node.js (for frontend in the same repo)
+node_modules/
+package-lock.json
+yarn.lock
+dist/
+
+# IDE-specific
+*.swp
+*.swo
+*.bak
+*.DS_Store
+Thumbs.db
