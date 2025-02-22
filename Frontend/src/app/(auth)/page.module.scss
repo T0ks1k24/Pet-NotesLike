@@ -1,0 +1,95 @@
+// page.module.scss
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 98vh;
+}
+
+.loginBox, .registerBox {
+  background: #4e4e4e;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #000000;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #000000;
+  margin-bottom: 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formGroup {
+  text-align: left;
+}
+
+.label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  color: #000000;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #000000;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: #006eff;
+    outline: none;
+  }
+}
+
+.registerButton, .loginButton {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #00fd4c;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background-color: #00505a;
+  }
+}
+
+.registerLink, .loginLink {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #000000;
+}
+
+.link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

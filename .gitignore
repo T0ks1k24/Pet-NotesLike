@@ -54,6 +54,7 @@ node_modules/
 package-lock.json
 yarn.lock
 dist/
+.next/
 
 # IDE-specific
 *.swp
