@@ -1,31 +1,66 @@
+using Backend.Data;
+using Backend.Infrastructure.Interface.IRepositories;
+using Backend.Infrastructure.Interface.IServices;
+using Backend.Infrastructure.Repositories;
+using Backend.Infrastructure.Security;
+using Backend.Infrastructure.Services;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
-namespace Backend
+namespace Backend;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        var builder = WebApplication.CreateBuilder(args);
+
+        var corsPolicy = "_myAllowSpecificOrigins";
+
+        builder.Services.AddCors(options =>
         {
-            var builder = WebApplication.CreateBuilder(args);
-
-            builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-            var app = builder.Build();
-            if (app.Environment.IsDevelopment())
+            options.AddPolicy(name: corsPolicy,
+            policy =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
+        });
 
-            app.UseHttpsRedirection();
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
 
-            app.UseAuthorization();
+        builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
+        builder.Services.AddScoped<INoteService, NoteService>();
+        builder.Services.AddScoped<INoteRepository, NoteRepository>();
 
 
-            app.MapControllers();
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            app.Run();
+
+        var app = builder.Build();
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
+
+        app.UseCors(corsPolicy);
+
+        app.UseHttpsRedirection();
+
+        app.UseAuthorization();
+
+
+        app.MapControllers();
+
+        app.Run();
     }
 }
