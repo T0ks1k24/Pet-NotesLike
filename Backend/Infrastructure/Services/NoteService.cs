@@ -14,9 +14,9 @@ public class NoteService :INoteService
         _noteRepository = noteRepository;
     }
 
-    public async Task<List<NoteDto>> GetAllByUserIdAsync(Guid userId)
+    public async Task<IEnumerable<NoteDto>> GetAllAsync()
     {
-        var notes = await _noteRepository.GetAllByUserIdAsync(userId);
+        var notes = await _noteRepository.GetAllAsync();
         return notes.Select(n => new NoteDto
         {
             Id = n.Id,
@@ -27,14 +27,27 @@ public class NoteService :INoteService
         }).ToList();
     }
 
+    public async Task<NoteDto?> GetByIdAsync(Guid id)
+    {
+        var note = await _noteRepository.GetByIdAsync(id);
+
+        return new NoteDto
+        {
+            Id = note.Id,
+            Title = note.Title,
+            Content = note.Content,
+            CreatedDate = note.CreatedDate,
+            UpdatedDate = note.UpdatedDate, 
+        };
+    }
+
     public async Task AddAsync(AddNoteDto noteDto)
     {
-        var note = new NoteEntity
+        var note = new Note
         {
             Id = Guid.NewGuid(),
             Title = noteDto.Title,
             Content = noteDto.Content,
-            UserId = noteDto.UserId,
             CreatedDate = DateTime.UtcNow,
             UpdatedDate = DateTime.UtcNow
         };
@@ -44,13 +57,22 @@ public class NoteService :INoteService
 
     public async Task UpdateAsync(Guid id, UpdateNoteDto noteDto)
     {
-        var note = new NoteEntity
-        {
-            Title = noteDto.Title,
-            Content = noteDto.Content
-        };
+        var existingNote = await _noteRepository.GetByIdAsync(id);
 
-        await _noteRepository.UpdateAsync(id, note);
+        if (existingNote == null)
+        {
+            throw new KeyNotFoundException($"Note with ID {id} not found.");
+        }
+
+        if(!string.IsNullOrEmpty(noteDto.Title))
+            existingNote.Title = noteDto.Title;
+
+        if(!string.IsNullOrEmpty(noteDto.Content))
+            existingNote.Content = noteDto.Content;
+
+        existingNote.UpdatedDate = DateTime.UtcNow;
+
+        await _noteRepository.UpdateAsync(existingNote);
     }
 
     public async Task DeleteAsync(Guid id)
@@ -59,5 +81,4 @@ public class NoteService :INoteService
     }
 
     
-  
 }

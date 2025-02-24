@@ -1,51 +1,59 @@
-import styles from "../page.module.scss";
+"use client";
 
-export default function Login() {
-	return (
-<main className={styles.container}>
-			<div className={styles.loginBox}>
-				<h1 className={styles.title}>Login to Your Account</h1>
-				<p className={styles.subtitle}>
-					Welcome back! Please enter your credentials.
-				</p>
-				<form className={styles.form}>
-					<div className={styles.formGroup}>
-						<label htmlFor="email" className={styles.label}>
-							Email
-						</label>
-						<input
-							type="email"
-							id="email"
-							name="email"
-							placeholder="Enter your email"
-							className={styles.input}
-						/>
-					</div>
-					<div className={styles.formGroup}>
-						<label htmlFor="password" className={styles.label}>
-							Password
-						</label>
-						<input
-							type="password"
-							id="password"
-							name="password"
-							placeholder="Enter your password"
-							className={styles.input}
-						/>
-					</div>
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Login } from "../../../services/authService";
+import styles from "./page.module.scss";
+import LoginForm from "../../../components/Auth/LoginForm/LoginForm";
 
-					<button type="submit" className={styles.loginButton}>
-						Log In
-					</button>
-				</form>
+export default function LoginPage() {
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [error, setError] = useState(null);
+	const router = useRouter();
 
-				<p className={styles.registerLink}>
-					Don't have an account?{" "}
-					<a href="/register" className={styles.link}>
-						Sign Up
-					</a>
-				</p>
-			</div>
-		</main>
-	);
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		setError(null);
+
+		try {
+			const response = await Login({ email, password });
+
+			if (response?.userId) {
+				localStorage.setItem("userId", response.userId);
+				router.push("/note");
+			} else {
+				setError("Invalid email or password");
+			}
+		} catch (error) {
+			setError(error.message || "Login failed. Please try again.");
+		}
+	};
+
+
+
+return (
+	<main className={styles.container}>
+		<div className={styles.loginBox}>
+			<h1 className={styles.title}>Login to Your Account</h1>
+			<p className={styles.subtitle}>
+				Welcome back! Please enter your credentials.
+			</p>
+			<LoginForm
+				email={email}
+				setEmail={setEmail}
+				password={password}
+				setPassword={setPassword}
+				handleSubmit={handleSubmit}
+				error={error}
+			/>
+			<p className={styles.registerLink}>
+				Don't have an account?{" "}
+				<a href="/register" className={styles.link}>
+					Sign Up
+				</a>
+			</p>
+		</div>
+	</main>
+);
 }

@@ -1,0 +1,31 @@
+.formGroup {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.label {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #fff;
+}
+
+.input {
+	width: 350px;
+	padding: 10px;
+	font-size: 1rem;
+	border-radius: 5px;
+	border: 1px solid #ccc;
+	background-color: #333;
+	color: #fff;
+	transition: border-color 0.3s ease;
+
+	&:focus {
+		outline: none;
+		border-color: rgb(0, 196, 59);
+	}
+
+	&::placeholder {
+		color: #bbb;
+	}
+}

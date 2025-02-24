@@ -15,11 +15,18 @@ public class NoteController : ControllerBase
         _noteService = noteService;
     }
 
-    [HttpGet("user/{userId}")]
-    public async Task<ActionResult<List<NoteDto>>> GetAllByUserId(Guid userId)
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<NoteDto>>> GetAll()
     {
-        var notes = await _noteService.GetAllByUserIdAsync(userId);
+        var notes = await _noteService.GetAllAsync();
         return Ok(notes);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<NoteDto>> GetById(Guid id)
+    {
+        var note = await _noteService.GetByIdAsync(id);
+        return Ok(note);
     }
 
     [HttpPost]
@@ -29,18 +36,27 @@ public class NoteController : ControllerBase
             return BadRequest(ModelState);
 
         await _noteService.AddAsync(noteDto);
-        return CreatedAtAction(nameof(GetAllByUserId), new { userId = noteDto.UserId }, noteDto);
+
+        return CreatedAtAction(nameof(GetById), new { id = noteDto.Id });
     }
 
-    [HttpPut("{id}")]
+    [HttpPatch("{id}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateNoteDto noteDto)
     {
-        if(!ModelState.IsValid)
+        if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        await _noteService.UpdateAsync(id, noteDto);
-        return NoContent();
+        try
+        {
+            await _noteService.UpdateAsync(id, noteDto);
+            return NoContent(); 
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound($"Note with ID {id} not found.");
+        }
     }
+
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)

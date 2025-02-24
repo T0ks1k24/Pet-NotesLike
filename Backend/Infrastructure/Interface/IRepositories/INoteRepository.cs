@@ -4,9 +4,10 @@ namespace Backend.Infrastructure.Interface.IRepositories
 {
     public interface INoteRepository
     {
-        Task<List<NoteEntity>> GetAllByUserIdAsync(Guid id);
-        Task AddAsync(NoteEntity note);
-        Task UpdateAsync(Guid id, NoteEntity note);
+        Task<IEnumerable<Note>> GetAllAsync();
+        Task<Note> GetByIdAsync(Guid id);
+        Task AddAsync(Note note);
+        Task UpdateAsync(Note note);
         Task DeleteAsync(Guid id);
     }
 }
