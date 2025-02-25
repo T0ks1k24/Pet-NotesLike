@@ -1,8 +1,10 @@
-import Login from "./(auth)/login/page";
-
+import NotesList from "../components/Features/NotesList/NotesList";
 
 export default function Index() {
 	return (
-		<Login />
+		<main>
+			<div>Головна</div>
+			<NotesList/>
+		</main>
 	);
 }

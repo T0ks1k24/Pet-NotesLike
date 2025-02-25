@@ -1,44 +1,46 @@
-const API_URL = "https://localhost:7040/api/Note"
+const API_URL = "https://localhost:7040/api/Note";
 
-export async function GetNotesByUserId(){
-  try {
-    const userId = localStorage.getItem("userId"); 
-    if (!userId) throw new Error("User ID not found");
-
-    const response = await fetch(`${API_URL}/${userId}`);
-    if(!response.ok) throw new Error("Failed to fetch notes");
-
-    return await response.json();
-  } catch (error) {
-    console.error("Error loading products:", error);
-    return [];
-  }
-}
-
-export async function createNote(note) {
+async function fetchData(url, options = {}) {
 	try {
-		const response = await fetch(API_URL, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(note),
-			mode: "cors",
-		});
-		if (!response.ok) throw new Error("Failed to create note");
+		const response = await fetch(url, options);
+		if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+		const contentType = response.headers.get("Content-Type");
+    if (response.status === 204 || !contentType || !contentType.includes("application/json")) {
+      return null; // No content or non-JSON content
+    }
+		
 		return await response.json();
 	} catch (error) {
-		console.error("Error creating note:", error);
+		console.error("Error loading products:", error);
+		return null;
 	}
 }
 
-export async function deleteProduct(NoteId) {
-	try {
-		const response = await fetch(`${API_URL}/${NoteId}`, {
-			method: "DELETE",
+export const GetAll = () => fetchData(API_URL);
+export const GetById = (id) => fetchData(`${API_URL}/${id}`);
+
+export const AddNote = (note) =>
+	fetchData(API_URL, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(note),
+		mode: "cors",
+	});
+
+export const UpdateNote = (id, note) =>
+	fetchData(`${API_URL}/${id}`, {
+		method: "PATCH",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(note),
+		mode: "cors",
+	});
+
+export const DeleteNote = (id) =>
+	fetchData(`${API_URL}/${id}`, { method: "DELETE" })
+		.then((response) => response.ok)
+		.catch((error) => {
+			console.error("Error deleting note:", error);
+			return false;
 		});
-		if (!response.ok) throw new Error("Failed to delete note");
-		return true;
-	} catch (error) {
-		console.error("Error deleting note:", error);
-		return false;
-	} 
-}
+
