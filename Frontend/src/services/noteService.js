@@ -3,17 +3,23 @@ const API_URL = "https://localhost:7040/api/Note";
 async function fetchData(url, options = {}) {
 	try {
 		const response = await fetch(url, options);
-		if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+		if (!response.ok)
+			throw new Error(`HTTP error! Status: ${response.status}`);
+
+		if (response.status == 204) {
+			return true;
+		}
 
 		const contentType = response.headers.get("Content-Type");
-    if (response.status === 204 || !contentType || !contentType.includes("application/json")) {
-      return null; // No content or non-JSON content
-    }
-		
+
+		if (!contentType || !contentType.includes("application/json")) {
+			return null;
+		}
+
 		return await response.json();
 	} catch (error) {
 		console.error("Error loading products:", error);
-		return null;
+		return false;
 	}
 }
 
@@ -43,4 +49,3 @@ export const DeleteNote = (id) =>
 			console.error("Error deleting note:", error);
 			return false;
 		});
-

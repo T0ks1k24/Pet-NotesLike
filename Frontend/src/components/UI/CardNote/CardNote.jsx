@@ -1,62 +1,54 @@
-import { useState, useEffect } from "react";
-import { UpdateNote } from "../../../services/noteService"; // Import the UpdateNote function
-import styles from "./CardNote.module.css";
+import { useState } from "react";
+import { DeleteNote, UpdateNote } from "../../../services/noteService";
+import styles from "./CardNote.module.scss";
 
-export default function CardNote({ id, title, content, onSave, onDelete }) {
+export default function CardNote({ id, title, content, onNoteDeleted }) {
   const [isEditing, setIsEditing] = useState(false);
   const [noteTitle, setNoteTitle] = useState(title);
   const [noteContent, setNoteContent] = useState(content);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isEditing && !event.target.closest("." + styles.card_note)) {
-        handleSave();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isEditing]);
-
   const handleSave = async () => {
-    if (isEditing && (title !== noteTitle || content !== noteContent)) {
-      try {
-        // Use UpdateNote to send the PATCH request
-        const updatedNote = await UpdateNote(id, { title: noteTitle, content: noteContent });
-        
-        // If the update is successful, call onSave
-        if (updatedNote) {
-          onSave(id, { title: noteTitle, content: noteContent });
-        }
-      } catch (error) {
-        console.error('Error updating the note:', error);
-      }
+    const updatedNote = {title: noteTitle, content: noteContent}
+    const result = await UpdateNote(id, updatedNote)
+    if (result){
+      setIsEditing(false);
     }
-    setIsEditing(false);
+  };
+
+  const handleDelete = async () => {
+    const isDeleted = await DeleteNote(id);
+    if(isDeleted && onNoteDeleted){
+      onNoteDeleted(id);
+    }
   };
 
   return (
-    <section className={styles.card_note} onClick={() => setIsEditing(true)}>
+    <section className={styles.card_note}>
       {isEditing ? (
         <>
           <input
             className={styles.input}
             value={noteTitle}
             onChange={(e) => setNoteTitle(e.target.value)}
-            autoFocus
           />
           <textarea
             className={styles.textarea}
             value={noteContent}
             onChange={(e) => setNoteContent(e.target.value)}
-            autoFocus
           />
+          <div className={styles.buttons}>
+            <button className={styles.save_btn} onClick={handleSave}>Зберегти</button>
+            <button className={styles.cancel_btn} onClick={() => setIsEditing(false)}>Скасувати</button>
+          </div>
         </>
       ) : (
         <>
           <h2 className={styles.h2}>{noteTitle}</h2>
           <p className={styles.p}>{noteContent}</p>
-          <button className={styles.button} onClick={() => onDelete(id)}>Delete</button>
+          <div className={styles.buttons}>
+            <button className={styles.edit_btn} onClick={() => setIsEditing(true)}>Редагувати</button>
+            <button className={styles.delete_btn} onClick={handleDelete}>Видалити</button>
+          </div>
         </>
       )}
     </section>
