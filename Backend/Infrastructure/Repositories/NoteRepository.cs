@@ -1,4 +1,5 @@
 ﻿using Backend.Data;
+using Backend.Data.DTOs.Note;
 using Backend.Data.Models;
 using Backend.Infrastructure.Interface.IRepositories;
 using Microsoft.EntityFrameworkCore;
@@ -21,10 +22,15 @@ public class NoteRepository : INoteRepository
     public async Task<Note?> GetByIdAsync(Guid id) => 
         await _context.Notes.AsNoTracking().FirstOrDefaultAsync(n=> n.Id == id);
 
-
     public async Task AddAsync(Note note)
     {
         await _context.Notes.AddAsync(note);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task AddNoteListAsync(NoteList noteList)
+    {
+        await _context.NoteLists.AddAsync(noteList);
         await _context.SaveChangesAsync();
     }
 
@@ -33,10 +39,8 @@ public class NoteRepository : INoteRepository
         var existingNote = await _context.Notes.FindAsync(note.Id);
 
         if (existingNote == null)
-        {
             throw new KeyNotFoundException($"Note with ID {note.Id} not found.");
-        }
-
+ 
         if(!string.IsNullOrEmpty(note.Title))
             existingNote.Title = note.Title;
 
@@ -51,12 +55,36 @@ public class NoteRepository : INoteRepository
 
     public async Task DeleteAsync(Guid id)
     {
-        var existingNote = await _context.Notes.FirstOrDefaultAsync(n => n.Id == id);
+        var existingNote = await _context.Notes.FindAsync(id);
 
         if (existingNote != null)
-        {
             _context.Notes.Remove(existingNote);
             await _context.SaveChangesAsync();
-        }
     }
+
+    public async Task<bool> IsOwner(Guid noteId, Guid userId)
+    {
+        return await _context.NoteLists.AnyAsync(nl => nl.NoteId == noteId && nl.UserId == userId && nl.AccessLevel == "Owner");
+    }
+
+    public async Task<List<NoteDto>> GetUserNotesAsync(Guid userId) => 
+        await _context.NoteLists
+            .Where(nl => nl.UserId == userId)
+            .Include(nl => nl.Note)
+            .Select(nl => new NoteDto
+            {
+                Id = nl.Note.Id,
+                Title = nl.Note.Title,
+                Content = nl.Note.Content,
+                CreatedDate = nl.Note.CreatedDate,
+                UpdatedDate = nl.Note.UpdatedDate,
+                AccessLevel = nl.AccessLevel,
+            }).ToListAsync();
+      
+
+
+
+ 
+
+
 }

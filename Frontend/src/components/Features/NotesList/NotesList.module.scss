@@ -28,7 +28,13 @@
   background-color: #0056b3;
 }
 
-/* Modal Form Styles */
+.h2_head_name {
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .modal {
   position: fixed;
   top: 0;
@@ -42,16 +48,22 @@
   z-index: 1000;
 }
 
+.textarea {
+  resize: none;
+}
+
 .modal_content {
-  background-color: white;
+  background-color: rgb(73, 73, 73);
   padding: 20px;
   border-radius: 8px;
   width: 400px;
+  height: 350px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .modal_content input,
 .modal_content textarea {
+  font-size: 20px;
   width: 100%;
   padding: 10px;
   margin: 10px 0;
@@ -59,9 +71,14 @@
   border-radius: 5px;
 }
 
+.modal_content textarea {
+  height: 100px;
+}
+
 .modal_content button {
   background-color: #007bff;
   color: white;
+  margin-right: 10px;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
@@ -75,7 +92,7 @@
 
 /* Cancel Button Style */
 .modal_content .cancel_button {
-  background-color: #ccc;
+  background-color: #6e6e6e;
   margin-top: 10px;
 }
 

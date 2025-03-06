@@ -10,4 +10,6 @@ public class Note
     public string Content { get; set; } = string.Empty;
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
+
+    public ICollection<NoteList> NoteLists { get; set; } = new List<NoteList>();
 }

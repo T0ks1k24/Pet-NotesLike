@@ -1,0 +1,39 @@
+.head_div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.h1 {
+  color: white;
+}
+
+
+.button {
+  background-color: #4CAF50; 
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.button:hover {
+  background-color: #45a049; 
+  transform: translateY(-2px);
+}
+
+
+.link {
+  text-decoration: none; 
+}
+
+.link:active .button {
+  transform: translateY(1px); 
+}

@@ -6,8 +6,10 @@ namespace Backend.Infrastructure.Interface.IServices
     {
         Task<IEnumerable<NoteDto>> GetAllAsync();
         Task<NoteDto> GetByIdAsync(Guid id);
-        Task AddAsync(AddNoteDto noteDto);
         Task UpdateAsync(Guid id, UpdateNoteDto noteDto);
         Task DeleteAsync(Guid id);
+        Task<Guid> AddNoteAsync(Guid userId, CreateNoteDto noteDto);
+        Task<IEnumerable<NoteDto>> GetUserNotesAsync(Guid userId);
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Backend.Data.DTOs.Note;
 using Backend.Data.Models;
+using Backend.Infrastructure.Interface;
 using Backend.Infrastructure.Interface.IRepositories;
 using Backend.Infrastructure.Interface.IServices;
 
@@ -12,6 +13,32 @@ public class NoteService :INoteService
     public NoteService(INoteRepository noteRepository)
     {
         _noteRepository = noteRepository;
+    }
+
+    public async Task DeleteAsync(Guid id) =>
+        await _noteRepository.DeleteAsync(id);
+
+    public async Task<Guid> AddNoteAsync(Guid userId, CreateNoteDto noteDto)
+    {
+        var newNote = new Note 
+        { 
+            Id = Guid.NewGuid(),
+            Title = noteDto.Title,
+            Content = noteDto.Content,
+            CreatedDate = DateTime.UtcNow
+        };
+
+        var noteList = new NoteList
+        {
+            UserId = userId,
+            NoteId = newNote.Id,
+            AccessLevel = noteDto.AccessLevel
+        };
+
+        await _noteRepository.AddAsync(newNote);
+        await _noteRepository.AddNoteListAsync(noteList);
+
+        return newNote.Id;
     }
 
     public async Task<IEnumerable<NoteDto>> GetAllAsync()
@@ -41,20 +68,6 @@ public class NoteService :INoteService
         };
     }
 
-    public async Task AddAsync(AddNoteDto noteDto)
-    {
-        var note = new Note
-        {
-            Id = Guid.NewGuid(),
-            Title = noteDto.Title,
-            Content = noteDto.Content,
-            CreatedDate = DateTime.UtcNow,
-            UpdatedDate = DateTime.UtcNow
-        };
-
-        await _noteRepository.AddAsync(note);
-    }
-
     public async Task UpdateAsync(Guid id, UpdateNoteDto noteDto)
     {
         var existingNote = await _noteRepository.GetByIdAsync(id);
@@ -75,10 +88,18 @@ public class NoteService :INoteService
         await _noteRepository.UpdateAsync(existingNote);
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task<IEnumerable<NoteDto>> GetUserNotesAsync(Guid userId)
     {
-        await _noteRepository.DeleteAsync(id);
+        var userNotes = await _noteRepository.GetUserNotesAsync(userId);
+        return userNotes.Select(n => new NoteDto
+        {
+            Id = n.Id,
+            Title = n.Title,
+            Content = n.Content,
+            CreatedDate = n.CreatedDate,
+            UpdatedDate = n.UpdatedDate
+        });
     }
 
-    
+
 }
