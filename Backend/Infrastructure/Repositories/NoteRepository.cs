@@ -62,10 +62,6 @@ public class NoteRepository : INoteRepository
             await _context.SaveChangesAsync();
     }
 
-    public async Task<bool> IsOwner(Guid noteId, Guid userId)
-    {
-        return await _context.NoteLists.AnyAsync(nl => nl.NoteId == noteId && nl.UserId == userId && nl.AccessLevel == "Owner");
-    }
 
     public async Task<List<NoteDto>> GetUserNotesAsync(Guid userId) => 
         await _context.NoteLists

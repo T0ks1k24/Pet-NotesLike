@@ -11,7 +11,7 @@ namespace Backend.Infrastructure.Interface.IRepositories
         Task UpdateAsync(Note note);
         Task DeleteAsync(Guid id);
         Task<List<NoteDto>> GetUserNotesAsync(Guid userId);
-        Task<bool> IsOwner(Guid noteId, Guid userId);
         Task AddNoteListAsync(NoteList noteList);
+        
     }
 }

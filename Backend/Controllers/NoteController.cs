@@ -12,10 +12,12 @@ namespace Backend.Controllers;
 public class NoteController : ControllerBase
 {
     private readonly INoteService _noteService;
+    private readonly INoteListService _noteListService;
 
-    public NoteController(INoteService noteService)
+    public NoteController(INoteService noteService, INoteListService noteListService)
     {
         _noteService = noteService;
+        _noteListService = noteListService;
     }
 
     [HttpGet]
@@ -68,12 +70,26 @@ public class NoteController : ControllerBase
     {
         var userNotes = await _noteService.GetUserNotesAsync(userId);
 
-        if(userNotes == null || !userNotes.Any())
+        if (userNotes == null || !userNotes.Any())
         {
             return NotFound($"No notes found for user with ID {userId}.");
         }
 
-        return Ok(userNotes);
+        var noteIds = userNotes.Select(n => n.Id).ToList();
+        var accessLevels = await _noteListService.GetUserAccessLevelsAsync(userId, noteIds);
+
+        var notesWithAccess = userNotes.Select(note => new
+        {
+            id = note.Id,
+            title = note.Title,
+            content = note.Content,
+            createdDate = note.CreatedDate,
+            updatedDate = note.UpdatedDate,
+            accessLevel = accessLevels.TryGetValue(note.Id, out var level) ? level : "Unknown"
+        });
+
+        return Ok(notesWithAccess);
     }
+
 
 }

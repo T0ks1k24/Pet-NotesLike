@@ -87,6 +87,9 @@ public class Program
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+        builder.Services.AddScoped<INoteListService, NoteListService>();
+        builder.Services.AddScoped<INoteListRepository, NoteListRepository>();
+
         var app = builder.Build();
 
         if (app.Environment.IsDevelopment())

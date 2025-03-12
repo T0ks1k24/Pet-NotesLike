@@ -32,7 +32,7 @@ public class NoteService :INoteService
         {
             UserId = userId,
             NoteId = newNote.Id,
-            AccessLevel = noteDto.AccessLevel
+            AccessLevel = "Owner"
         };
 
         await _noteRepository.AddAsync(newNote);
