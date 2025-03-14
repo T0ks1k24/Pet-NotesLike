@@ -1,5 +1,6 @@
 ﻿using Backend.Infrastructure.Interface.IRepositories;
 using Backend.Infrastructure.Interface.IServices;
+using Backend.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Infrastructure.Services;
@@ -21,6 +22,16 @@ public class NoteListService : INoteListService
     public async Task<Dictionary<Guid, string>> GetUserAccessLevelsAsync(Guid userId, List<Guid> noteIds)
     {
         return await _noteListRepository.GetUserAccessLevelsAsync(userId, noteIds);
+    }
+
+    public async Task<bool> UpdateAccessLevelAsync(Guid noteId, Guid userId, string newAccessLevel)
+    {
+        if(newAccessLevel == "Read" || newAccessLevel == "Edit")
+        {
+            return await _noteListRepository.UpdateAccessLevel(noteId, userId, newAccessLevel);
+        }
+
+        return false;
     }
 
 

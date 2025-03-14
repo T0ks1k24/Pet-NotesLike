@@ -11,5 +11,7 @@ namespace Backend.Infrastructure.Interface.IServices
         Task<Guid> AddNoteAsync(Guid userId, CreateNoteDto noteDto);
         Task<IEnumerable<NoteDto>> GetUserNotesAsync(Guid userId);
 
+        
+
     }
 }

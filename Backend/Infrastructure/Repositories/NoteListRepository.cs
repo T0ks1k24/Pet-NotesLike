@@ -43,25 +43,47 @@ public class NoteListRepository : INoteListRepository
         if (!await IsOwnerAsync(ownerId, noteId))
             throw new UnauthorizedAccessException("Тільки власник може ділитися нотаткою.");
 
-        var existingAccess = await _context.NoteLists.FirstOrDefaultAsync(n => n.UserId == user.Id && n.NoteId == noteId);
+        var existingAccess = await _context.NoteLists
+        .FirstOrDefaultAsync(nl => nl.UserId == user.Id && nl.NoteId == noteId);
 
-        if (existingAccess == null)
+        if (existingAccess != null)
         {
-            existingAccess = new NoteList
+            if (existingAccess.AccessLevel == accessLevel)
+                throw new InvalidOperationException("Цей рівень доступу вже встановлений.");
+            existingAccess.AccessLevel = accessLevel;
+        }
+        else
+        {
+            var newAccess = new NoteList
             {
                 UserId = user.Id,
-                NoteId = noteId
+                NoteId = noteId,
+                AccessLevel = accessLevel
             };
-            await _context.NoteLists.AddAsync(existingAccess);
+            await _context.NoteLists.AddAsync(newAccess);
         }
-        existingAccess.AccessLevel = accessLevel;
+
         await _context.SaveChangesAsync();
     }
 
     public async Task<Dictionary<Guid, string>> GetUserAccessLevelsAsync(Guid userId, List<Guid> noteIds)
     {
         return await _context.NoteLists
-            .Where(nl => noteIds.Contains(nl.NoteId) && nl.UserId == userId) 
+            .Where(nl => noteIds.Contains(nl.NoteId) && nl.UserId == userId)
             .ToDictionaryAsync(nl => nl.NoteId, nl => nl.AccessLevel);
+    }
+
+    public async Task<bool> UpdateAccessLevel(Guid noteId, Guid userId, string newAccessLevel)
+    {
+        var noteList = await _context.NoteLists
+            .Where(nl => nl.NoteId == noteId && nl.UserId == userId && nl.AccessLevel != "Owner")
+            .FirstOrDefaultAsync();
+
+        if (noteList == null) return false;
+
+        noteList.AccessLevel = newAccessLevel;
+        await _context.SaveChangesAsync();
+        return true;
+
     }
 }
